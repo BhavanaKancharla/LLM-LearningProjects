@@ -1,0 +1,5 @@
+Python is a general-purpose programming language known for readable syntax and a large ecosystem. It is commonly used for automation, data analysis, web applications, scripting, and artificial intelligence projects.
+
+Python programs are usually organized into modules and packages. A module is a single Python file, while a package is a folder containing related modules. Python uses indentation to define code blocks, which makes the structure visually clear.
+
+Python is popular in AI because libraries such as NumPy, pandas, PyTorch, TensorFlow, scikit-learn, FastAPI, and Streamlit make it easy to build useful systems quickly.

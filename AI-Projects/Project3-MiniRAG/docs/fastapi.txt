@@ -1,0 +1,5 @@
+FastAPI is a modern Python web framework for building APIs. It is designed around type hints, automatic validation, and automatic API documentation. FastAPI is often used to expose machine learning models or backend services through HTTP endpoints.
+
+A FastAPI app usually defines route functions with decorators such as @app.get or @app.post. Request and response data can be modeled with Pydantic classes. FastAPI can run with Uvicorn during development.
+
+FastAPI is useful for AI systems because it can wrap model calls, retrieval pipelines, tools, and database access behind clean API endpoints.

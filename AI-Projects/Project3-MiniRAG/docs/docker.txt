@@ -1,0 +1,5 @@
+Docker is a platform for packaging applications into containers. A container includes the application code, runtime, dependencies, and configuration needed to run consistently across machines.
+
+A Dockerfile defines how to build an image. The image can then be run as a container. Common Docker commands include docker build, docker run, docker ps, and docker logs.
+
+Docker helps AI projects because model-serving apps often need specific Python versions, system packages, and environment variables. Containers make deployment more reproducible.

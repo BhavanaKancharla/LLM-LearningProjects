@@ -1,0 +1,5 @@
+PostgreSQL is a relational database known for reliability, SQL support, indexing, transactions, and extensibility. It stores structured data in tables with rows and columns.
+
+Applications use SQL queries to insert, update, delete, and retrieve records. PostgreSQL supports indexes, joins, constraints, JSON fields, and full-text search.
+
+AI applications often use PostgreSQL for user data, conversation metadata, application records, analytics, and sometimes vector search through extensions such as pgvector.

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Auto-Generate Documentation from Source Code</h2>
+    <p style="color:#666; margin-bottom:1.5rem;">
+        Point to any project directory and the tool will scan Python, JavaScript, TypeScript,
+        and React files to extract documentation automatically.
+    </p>
+    <form method="post" action="/generate">
+        <label for="project_path">Project Path *</label>
+        <input type="text" id="project_path" name="project_path"
+               placeholder="e.g. C:\Users\you\projects\my-app" required>
+        <p class="hint">Absolute path to the project folder to scan.</p>
+
+        <label for="project_name">Project Name</label>
+        <input type="text" id="project_name" name="project_name"
+               placeholder="e.g. My Web App (defaults to folder name)">
+
+        <label for="exclude_dirs">Exclude Directories</label>
+        <input type="text" id="exclude_dirs" name="exclude_dirs"
+               placeholder="venv, __pycache__, .git, node_modules"
+               value="venv, __pycache__, .git, node_modules, .venv, dist, build, .next, coverage">
+        <p class="hint">Comma-separated list of folder names to skip.</p>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">🔍 Scan &amp; Generate Docs</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Supported Languages &amp; What Gets Extracted</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+        <thead>
+            <tr style="border-bottom:2px solid #ddd; text-align:left;">
+                <th style="padding:0.5rem;">Language</th>
+                <th style="padding:0.5rem;">Extensions</th>
+                <th style="padding:0.5rem;">Extracts</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>Python</strong></td>
+                <td style="padding:0.5rem;"><code>.py</code></td>
+                <td style="padding:0.5rem;">Docstrings, classes, functions, Flask/FastAPI routes, constants, imports</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>JavaScript</strong></td>
+                <td style="padding:0.5rem;"><code>.js</code>, <code>.mjs</code>, <code>.cjs</code></td>
+                <td style="padding:0.5rem;">JSDoc comments, classes, functions, Express routes, constants, imports</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>TypeScript</strong></td>
+                <td style="padding:0.5rem;"><code>.ts</code></td>
+                <td style="padding:0.5rem;">JSDoc, classes, functions, interfaces/types, routes, constants</td>
+            </tr>
+            <tr>
+                <td style="padding:0.5rem;"><strong>React</strong></td>
+                <td style="padding:0.5rem;"><code>.jsx</code>, <code>.tsx</code></td>
+                <td style="padding:0.5rem;">Components, props interfaces, hooks, JSDoc, functions</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- TAB SWITCHER -->
+<div style="display:flex; gap:0; margin-bottom:0;">
+    <button type="button" id="tab-scan" class="tab-btn active"
+            onclick="switchTab('scan')">🔍 Scan from Source</button>
+    <button type="button" id="tab-manual" class="tab-btn"
+            onclick="switchTab('manual')">✏️ Manual Entry</button>
+</div>
+
+<!-- SCAN MODE -->
+<div id="panel-scan" class="card" style="border-top-left-radius:0;">
+    <h2>Generate Feature Documentation from Source</h2>
+    <p style="color:#666; margin-bottom:1.5rem;">
+        Point to a local project folder or GitLab repository URL. The tool scans the code
+        and generates structured documentation — modules, endpoints, database schemas, config — automatically.
+    </p>
+    <form method="post" action="/feature-doc">
+        <input type="hidden" name="mode" value="scan">
+
+        <label for="source_path">Project Path or GitLab URL *</label>
+        <input type="text" id="source_path" name="source_path"
+               placeholder="C:\Users\you\projects\my-app  or  https://gitlab.com/team/repo" required>
+        <p class="hint">Local folder path or full GitLab repository URL (supports branch/subfolder links).</p>
+
+        <label for="scan_project_name">Project Name</label>
+        <input type="text" id="scan_project_name" name="scan_project_name"
+               placeholder="e.g. CRTDB Backend (defaults to folder name)">
+
+        <label for="gitlab_token">GitLab Token (for private repos)</label>
+        <input type="text" id="gitlab_token" name="gitlab_token"
+               placeholder="glpat-xxxxxxxxxxxx (leave blank for public repos)">
+        <p class="hint">Only needed for private GitLab repositories.</p>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">🔍 Scan &amp; Generate</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+
+    <div style="margin-top:1.5rem; padding:1rem; background:#f0f4ff; border-radius:6px;">
+        <strong>What gets extracted:</strong>
+        <ul style="margin-top:0.5rem; padding-left:1.2rem; color:#555; line-height:1.8;">
+            <li><strong>Modules</strong> — file descriptions, functions, React components with props</li>
+            <li><strong>API Endpoints</strong> — path, method, handler, payload fields, response structure, logic steps</li>
+            <li><strong>Database</strong> — CREATE TABLE statements, column types, constraints</li>
+            <li><strong>Config</strong> — route configs (YAML), package.json scripts &amp; dependencies</li>
+        </ul>
+        <p style="margin-top:0.5rem; font-size:0.85rem; color:#888;">
+            Supports: Python (Flask/FastAPI), JavaScript, TypeScript, React (JSX/TSX), Node.js (Express), SQL, YAML
+        </p>
+    </div>
+</div>
+
+<!-- MANUAL MODE -->
+<div id="panel-manual" class="card" style="display:none; border-top-right-radius:0;">
+    <h2>Create Feature Documentation Manually</h2>
+    <p style="color:#666; margin-bottom:1.5rem;">
+        Build documentation section by section when you need full control over the content.
+    </p>
+    <form method="post" action="/feature-doc">
+        <input type="hidden" name="mode" value="manual">
+
+        <label for="feature_name">Feature / Document Title *</label>
+        <input type="text" id="feature_name" name="feature_name"
+               placeholder="e.g. Contrast Algorithms Feature Documentation" required>
+
+        <label for="author">Author</label>
+        <input type="text" id="author" name="author" placeholder="e.g. John Doe or BEMSID">
+
+        <label for="overview">Overview *</label>
+        <textarea id="overview" name="overview" rows="4"
+                  placeholder="What this feature does at a high level..."></textarea>
+
+        <hr style="margin:1.5rem 0; border:none; border-top:1px solid #eee;">
+        <div id="sections-container"></div>
+
+        <div style="margin:1.5rem 0; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary" onclick="addModule()"
+                    style="font-size:0.85rem;">+ Module</button>
+            <button type="button" class="btn btn-success" onclick="addEndpoint()"
+                    style="font-size:0.85rem;">+ Endpoint</button>
+            <button type="button" class="btn btn-secondary" onclick="addDatabase()"
+                    style="font-size:0.85rem;">+ Database</button>
+            <button type="button" class="btn btn-secondary" onclick="addConfig()"
+                    style="font-size:0.85rem;">+ Config</button>
+        </div>
+
+        <hr style="margin:1.5rem 0; border:none; border-top:1px solid #eee;">
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">📄 Generate Document</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.tab-btn {
+    padding: 0.7rem 1.5rem;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border-radius: 8px 8px 0 0;
+    color: #666;
+    transition: background 0.2s;
+}
+.tab-btn.active {
+    background: white;
+    color: #3f51b5;
+    font-weight: 500;
+    border-color: #ddd;
+    border-bottom: 1px solid white;
+    margin-bottom: -1px;
+    position: relative;
+    z-index: 1;
+}
+</style>
+
+<script>
+function switchTab(tab) {
+    document.getElementById('panel-scan').style.display = tab === 'scan' ? 'block' : 'none';
+    document.getElementById('panel-manual').style.display = tab === 'manual' ? 'block' : 'none';
+    document.getElementById('tab-scan').classList.toggle('active', tab === 'scan');
+    document.getElementById('tab-manual').classList.toggle('active', tab === 'manual');
+}
+
+let sectionCount = 0;
+
+function removeSection(id) {
+    document.getElementById(id).remove();
+}
+
+function sectionHeader(id, title) {
+    return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+        <h3 style="color:#3f51b5;margin:0;">${title}</h3>
+        <button type="button" onclick="removeSection('${id}')"
+                style="background:none;border:none;color:#c62828;font-size:1.2rem;cursor:pointer;">✕</button>
+    </div>`;
+}
+
+function addModule() {
+    sectionCount++;
+    const id = `section-${sectionCount}`;
+    const html = `
+    <div id="${id}" style="border:1px solid #e0e0e0;border-radius:8px;padding:1.2rem;margin-bottom:1rem;background:#fafbfc;">
+        ${sectionHeader(id, 'Module / Component')}
+        <input type="hidden" name="section_type[]" value="module">
+        <label>File Path / Module Name</label>
+        <input type="text" name="mod_file[]" placeholder="e.g. ClientApp/src/components/ContrastPlots.jsx">
+        <label>Description</label>
+        <textarea name="mod_what[]" rows="2" placeholder="What this module does..."></textarea>
+        <label>Features / Responsibilities (one per line)</label>
+        <textarea name="mod_features[]" rows="4" placeholder="- Listens to store event&#10;- Renders side-by-side plots&#10;- Auto-loads first tab"></textarea>
+        <label>How It Works</label>
+        <textarea name="mod_how[]" rows="3" placeholder="Lifecycle, state flow, key logic..."></textarea>
+        <label>Why / Design Decisions</label>
+        <textarea name="mod_why[]" rows="2" placeholder="Why this approach was chosen..."></textarea>
+        <label>Parameters (name → description, one per line)</label>
+        <textarea name="mod_params[]" rows="3" placeholder="xAxis → value to add&#10;yAxis → Deviation Threshold"></textarea>
+    </div>`;
+    document.getElementById('sections-container').insertAdjacentHTML('beforeend', html);
+}
+
+function addEndpoint() {
+    sectionCount++;
+    const id = `section-${sectionCount}`;
+    const html = `
+    <div id="${id}" style="border:1px solid #e0e0e0;border-radius:8px;padding:1.2rem;margin-bottom:1rem;background:#f9fbf9;">
+        ${sectionHeader(id, 'API Endpoint')}
+        <input type="hidden" name="section_type[]" value="endpoint">
+        <label>Endpoint</label>
+        <input type="text" name="ep_path[]" placeholder="e.g. POST /boeing/crtdb/applyAlgorithm">
+        <label>Handler / Function</label>
+        <input type="text" name="ep_handler[]" placeholder="e.g. apply_algorithm_handler()">
+        <label>File Path</label>
+        <input type="text" name="ep_file[]" placeholder="e.g. app/routes/applyAlgorithm.py">
+        <label>Purpose</label>
+        <textarea name="ep_purpose[]" rows="2" placeholder="What this endpoint does..."></textarea>
+        <label>Logic (step by step)</label>
+        <textarea name="ep_logic[]" rows="4" placeholder="1. Extracts fields from body&#10;2. Validates required fields&#10;3. Applies transformation&#10;4. Returns processed data"></textarea>
+        <label>Request Payload</label>
+        <textarea name="ep_request[]" rows="4" placeholder='{"project": "TSTPRJ", ...}'></textarea>
+        <label>Response</label>
+        <textarea name="ep_response[]" rows="4" placeholder='{"success": true, "data": {...}}'></textarea>
+        <label>Error Responses</label>
+        <textarea name="ep_errors[]" rows="2" placeholder="400 (missing fields), 500 (exception)"></textarea>
+        <label>Notes</label>
+        <textarea name="ep_notes[]" rows="2" placeholder="Any important details..."></textarea>
+    </div>`;
+    document.getElementById('sections-container').insertAdjacentHTML('beforeend', html);
+}
+
+function addDatabase() {
+    sectionCount++;
+    const id = `section-${sectionCount}`;
+    const html = `
+    <div id="${id}" style="border:1px solid #e0e0e0;border-radius:8px;padding:1.2rem;margin-bottom:1rem;background:#fdfaf9;">
+        ${sectionHeader(id, 'Database / Table')}
+        <input type="hidden" name="section_type[]" value="database">
+        <label>Table Name</label>
+        <input type="text" name="db_name[]" placeholder="e.g. crtdb_modified_data">
+        <label>Description</label>
+        <textarea name="db_desc[]" rows="2" placeholder="What this table stores..."></textarea>
+        <label>Columns (name | type | description — one per line)</label>
+        <textarea name="db_schema[]" rows="5" placeholder="id | INTEGER | Auto-incremented PK&#10;project | TEXT | Project identifier"></textarea>
+        <label>Constraints</label>
+        <textarea name="db_constraints[]" rows="2" placeholder="UNIQUE(project, tail, test, EventId)"></textarea>
+        <label>Behavior</label>
+        <textarea name="db_notes[]" rows="2" placeholder="UPSERT on conflict..."></textarea>
+    </div>`;
+    document.getElementById('sections-container').insertAdjacentHTML('beforeend', html);
+}
+
+function addConfig() {
+    sectionCount++;
+    const id = `section-${sectionCount}`;
+    const html = `
+    <div id="${id}" style="border:1px solid #e0e0e0;border-radius:8px;padding:1.2rem;margin-bottom:1rem;background:#f9f9fd;">
+        ${sectionHeader(id, 'Config / Other')}
+        <input type="hidden" name="section_type[]" value="config">
+        <label>File / Area</label>
+        <input type="text" name="cfg_file[]" placeholder="e.g. config.yaml">
+        <label>What Changed</label>
+        <textarea name="cfg_desc[]" rows="3" placeholder="Describe changes..."></textarea>
+        <label>Details / Values</label>
+        <textarea name="cfg_details[]" rows="3" placeholder="Config snippets, env vars..."></textarea>
+    </div>`;
+    document.getElementById('sections-container').insertAdjacentHTML('beforeend', html);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+Kubernetes is a container orchestration platform. It manages containerized applications across multiple machines. Kubernetes can restart failed containers, scale workloads, expose services, and manage deployments.
+
+Important Kubernetes objects include Pods, Deployments, Services, ConfigMaps, Secrets, and Ingress resources. A Deployment manages replicas of an application. A Service provides stable networking for Pods.
+
+Kubernetes is useful for production AI systems when applications need scaling, reliability, and controlled deployments.

@@ -1,0 +1,20 @@
+& "C:\Users\du974f\Downloads\ollama-windows-amd64\ollama.exe" serve
+& "C:\Users\du974f\Downloads\ollama-windows-amd64\ollama.exe" pull llama3
+
+pulling bigger model
+& "C:\Users\du974f\Downloads\ollama-windows-amd64\ollama.exe" pull codellama:13b
+
+
+
+api key for gemini api
+API KEY
+YOUR_GEMINI_API_KEY_HERE
+
+NAME
+Gemini API Key
+
+PROJECT NAME
+projects/326738484783
+
+PROJECT NUMBER
+326738484783

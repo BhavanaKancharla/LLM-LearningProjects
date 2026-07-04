@@ -1,0 +1,55 @@
+Foundation (Weeks 1-3)
+LLM basics & prompts
+
+W1
+Learn LLM fundamentals (tokens, embeddings, context)
+Practice prompt engineering with simple Q&A
+
+W2
+Build a basic chatbot using OpenAI/Anthropic API/Gemini API
+Experiment with temperature & max tokens
+
+W3
+Create a document summarizer
+Deploy on GitHub Pages or Streamlit
+
+Integration (Weeks 4-6)
+RAG & data pipelines
+
+W4
+Learn vector databases (FAISS, Pinecone)
+Store embeddings for small datasets
+
+W5
+Build a PDF Q&A assistant
+Connect external docs to LLM
+
+W6
+Create a multi-source RAG app (PDFs + APIs)
+Deploy on cloud (Render/Heroku)
+
+Applied Projects (Weeks 7-9)
+Workflow automation
+
+W7
+Build an AI career coach (resume parser + job match)
+Use AI for structured outputs
+
+W8
+Create a research agent (search + summarize)
+Chain tasks with LangChain
+
+W9
+Develop a code helper (LeetCode explainer)
+Add guardrails for accuracy
+
+Production (Weeks 10-12)
+Scaling & deployment
+
+W10
+Learn evaluation frameworks (LLM-as-judge)
+Add monitoring & logging
+
+W11
+Deploy a full-stack AI app (React + Flask + LLM)
+Test with real users

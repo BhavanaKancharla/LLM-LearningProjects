@@ -1,0 +1,114 @@
+Project 1: Chat
+
+This is the simplest LLM app.
+It sends a prompt to Gemini and prints the response.
+
+You learn:
+What a prompt is
+How an API key is loaded from .env
+How your Python code talks to an LLM
+How the model returns generated text
+
+Flow:
+User prompt -> Gemini -> AI response
+
+
+Project 2: Weather Tool
+
+This teaches tool calling.
+Instead of only answering from its own knowledge, Gemini can decide:
+    I need to call a function.
+
+Flow:
+User asks weather question
+        ↓
+Gemini decides to call get_weather
+        ↓
+Python runs get_weather("Bangalore")
+        ↓
+Tool returns weather result
+        ↓
+Gemini writes final answer
+
+This is the foundation of agents. Agents are basically LLMs that can use tools.
+
+
+Project 3: Mini RAG
+
+This teaches RAG, which means Retrieval Augmented Generation.
+
+You have 5 text documents:
+Python
+FastAPI
+Docker
+Kubernetes
+PostgreSQL
+
+The project first converts each document into an embedding, which is a numeric meaning-vector.
+
+Then when you ask a question, it:
+
+Converts your question into an embedding
+Compares it with document embeddings
+Finds the most relevant docs
+Sends only those docs to Gemini
+Gemini answers using that context
+
+Flow:
+Question
+   ↓
+Question embedding
+   ↓
+Similarity search
+   ↓
+Relevant docs
+   ↓
+Gemini answer
+
+
+
+Project 4: PDF Chatbot
+
+This is a bigger version of Project 3.
+Instead of 5 small .txt files, it uses a PDF.
+
+When you indexed your resume, it did this:
+PDF
+ ↓
+Extract text
+ ↓
+Split into chunks
+ ↓
+Create embeddings for each chunk
+ ↓
+Save vectors in pdf_vector_store.json
+
+Then when you ask a question:
+Question
+ ↓
+Question embedding
+ ↓
+Find best PDF chunks
+ ↓
+Send chunks to Gemini
+ ↓
+Answer based on the PDF
+
+
+
+
+
+
+This teaches the full RAG architecture:
+
+PDF parsing
+Chunking
+Embeddings
+Vector search
+Context building
+Answer generation
+
+Project 1: Talk to an LLM
+Project 2: Let the LLM use tools
+Project 3: Let the LLM search text documents
+Project 4: Let the LLM chat with PDFs

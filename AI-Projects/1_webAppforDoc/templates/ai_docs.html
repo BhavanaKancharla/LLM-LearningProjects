@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>🤖 AI-Powered Documentation Generator</h2>
+    <p style="color:#666; margin-bottom:1.5rem;">
+        Point to any project directory and AI will analyze the source code to generate
+        documentation explaining <strong>how it works</strong>, the <strong>logic flow</strong>,
+        <strong>architecture</strong>, and <strong>data flow</strong> — even without code comments.
+    </p>
+
+    {% if not providers %}
+    <div class="flash error">
+        <strong>No AI providers configured.</strong> Choose one of these FREE options:
+        <ul style="margin-top:0.5rem; padding-left:1.5rem;">
+            <li><strong>Google Gemini (FREE)</strong> — Get a free key from <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>, then set <code>GEMINI_API_KEY</code></li>
+            <li><strong>Ollama (FREE, Local)</strong> — Install from <a href="https://ollama.com" target="_blank">ollama.com</a>, run <code>ollama pull llama3</code>, no key needed</li>
+        </ul>
+        <p style="margin-top:0.5rem;">Or enter your API key directly in the form below.</p>
+    </div>
+    {% endif %}
+
+    <form method="post" action="/ai-docs" id="ai-form">
+        <label for="project_path">Project Path *</label>
+        <input type="text" id="project_path" name="project_path"
+               placeholder="e.g. C:\Users\you\projects\my-app" required>
+        <p class="hint">Absolute path to the project folder to analyze.</p>
+
+        <label for="project_name">Project Name</label>
+        <input type="text" id="project_name" name="project_name"
+               placeholder="e.g. CRTDB Backend (defaults to folder name)">
+
+        <label for="provider">AI Provider</label>
+        <select id="provider" name="provider" style="width:100%; padding:0.6rem 0.8rem; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; margin-bottom:1rem;">
+            <option value="gemini" {% if 'gemini' in providers %}selected{% endif %}>🆓 Google Gemini (FREE - 1M tokens/day)</option>
+            <option value="ollama">🆓 Ollama (FREE - runs locally, no key needed)</option>
+            <option value="openai" {% if 'openai' in providers and 'gemini' not in providers %}selected{% endif %}>OpenAI (GPT-4o) — paid</option>
+            <option value="anthropic">Anthropic (Claude) — paid</option>
+        </select>
+        <p class="hint">Gemini and Ollama are completely free. Gemini just needs a free API key from Google.</p>
+
+        <label for="api_key">API Key (optional for Ollama, required for Gemini/OpenAI/Anthropic)</label>
+        <input type="password" id="api_key" name="api_key"
+               placeholder="Gemini: AIza... | OpenAI: sk-... | Leave blank for Ollama"
+               style="width:100%; padding:0.6rem 0.8rem; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; margin-bottom:1rem;">
+        <p class="hint">For Gemini: get a free key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>. For Ollama: leave blank.</p>
+
+        <label for="model">Model (optional — uses default if blank)</label>
+        <input type="text" id="model" name="model"
+               placeholder="e.g. gemini-2.0-flash, llama3, gpt-4o-mini">
+        <p class="hint">Gemini default: gemini-2.0-flash | Ollama default: llama3 | Leave blank for recommended.</p>
+
+        <label>Focus Areas (select what to emphasize)</label>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+            <label style="display:inline-flex; align-items:center; gap:0.3rem; font-weight:normal; cursor:pointer; padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px;">
+                <input type="checkbox" name="focus" value="flow" checked> Logic Flow
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.3rem; font-weight:normal; cursor:pointer; padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px;">
+                <input type="checkbox" name="focus" value="architecture" checked> Architecture
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.3rem; font-weight:normal; cursor:pointer; padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px;">
+                <input type="checkbox" name="focus" value="api"> API Endpoints
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.3rem; font-weight:normal; cursor:pointer; padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px;">
+                <input type="checkbox" name="focus" value="data"> Data Flow
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.3rem; font-weight:normal; cursor:pointer; padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px;">
+                <input type="checkbox" name="focus" value="security"> Security
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.3rem; font-weight:normal; cursor:pointer; padding:0.3rem 0.6rem; border:1px solid #ddd; border-radius:4px;">
+                <input type="checkbox" name="focus" value="deployment"> Deployment
+            </label>
+        </div>
+
+        <label for="exclude_dirs">Exclude Directories</label>
+        <input type="text" id="exclude_dirs" name="exclude_dirs"
+               placeholder="venv, __pycache__, .git, node_modules"
+               value="venv, __pycache__, .git, node_modules, .venv, dist, build, .next, coverage">
+        <p class="hint">Comma-separated list of folder names to skip.</p>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+                🤖 Generate AI Documentation
+            </button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>How It Works</h2>
+    <ol style="padding-left: 1.2rem; color: #555;">
+        <li><strong>Scans</strong> your project directory for source files (Python, JS, TS, React, etc.)</li>
+        <li><strong>Sends</strong> the code to the AI model for deep analysis</li>
+        <li><strong>Generates</strong> rich documentation explaining logic flow, architecture, and data flow</li>
+        <li><strong>Saves</strong> the result as a Markdown file in your <code>docs/</code> folder</li>
+    </ol>
+
+    <h3 style="margin-top:1rem; color:#555;">What You Get</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem; margin-top:0.5rem;">
+        <thead>
+            <tr style="border-bottom:2px solid #ddd; text-align:left;">
+                <th style="padding:0.5rem;">Section</th>
+                <th style="padding:0.5rem;">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>Overview</strong></td>
+                <td style="padding:0.5rem;">What the project does and what problem it solves</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>Architecture</strong></td>
+                <td style="padding:0.5rem;">How components are structured and connected</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>Application Flow</strong></td>
+                <td style="padding:0.5rem;">End-to-end flow from startup to request handling</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>Key Modules</strong></td>
+                <td style="padding:0.5rem;">Each module's purpose, functions, and connections</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.5rem;"><strong>API Documentation</strong></td>
+                <td style="padding:0.5rem;">Every endpoint with request/response details</td>
+            </tr>
+            <tr>
+                <td style="padding:0.5rem;"><strong>Data Flow</strong></td>
+                <td style="padding:0.5rem;">How data moves through the entire system</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById('ai-form').addEventListener('submit', function() {
+    var btn = document.getElementById('submit-btn');
+    btn.textContent = '⏳ Analyzing code... (this may take 30-60 seconds)';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+});
+</script>
+{% endblock %}

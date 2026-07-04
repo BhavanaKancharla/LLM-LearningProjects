@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Release Documents</h2>
+    {% if releases %}
+        <ul class="release-list">
+            {% for release in releases %}
+                <li>
+                    <span class="badge">MD</span>
+                    <a href="/view/{{ release.slug }}" style="text-decoration:none; color:#333;">{{ release.name }}</a>
+                    <form action="/delete/{{ release.slug }}" method="post" style="margin-left:auto;"
+                          onsubmit="return confirm('Delete this release document?');">
+                        <button type="submit" class="btn-delete" title="Delete">✕</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color: #888;">No release documents yet. Create your first one!</p>
+    {% endif %}
+
+    <div class="actions">
+        <a href="/ai-docs" class="btn btn-primary" style="background:#e65100;">🤖 Generate Documentation</a>
+        <form action="/build" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-secondary">🔨 Build Static Site</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Quick Start</h2>
+    <ol style="padding-left: 1.2rem; color: #555;">
+        <li>Click <strong>"Generate Documentation"</strong> to analyze a project with AI.</li>
+        <li>Point it at any project folder — it will scan the code and generate documentation.</li>
+        <li>Click a document name to view the rendered documentation.</li>
+        <li>Click <strong>"Build Static Site"</strong> to export all docs as a deployable HTML site in <code>site/</code>.</li>
+    </ol>
+</div>
+{% endblock %}

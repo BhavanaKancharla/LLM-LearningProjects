@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="margin-bottom:0;">{{ name }}</h2>
+        <a href="/" class="btn btn-secondary">← Back to List</a>
+    </div>
+    <div class="rendered-doc">
+        {{ content | safe }}
+    </div>
+</div>
+
+<div class="card">
+    <h2>Raw Markdown</h2>
+    <pre style="background:#f5f5f5; padding:1rem; border-radius:6px; overflow-x:auto; font-size:0.85rem; line-height:1.5;">{{ raw_md }}</pre>
+</div>
+{% endblock %}

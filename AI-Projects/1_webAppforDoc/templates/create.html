@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Create Release Document</h2>
+    <form method="post" action="/create">
+        <label for="project_name">Project Name *</label>
+        <input type="text" id="project_name" name="project_name" placeholder="e.g. My Web App" required>
+
+        <label for="version">Version *</label>
+        <input type="text" id="version" name="version" placeholder="e.g. 2.1.0" required>
+
+        <label for="release_date">Release Date</label>
+        <input type="date" id="release_date" name="release_date">
+        <p class="hint">Leave blank to use today's date.</p>
+
+        <label for="summary">Summary</label>
+        <textarea id="summary" name="summary" placeholder="Brief overview of this release..."></textarea>
+
+        <label for="new_features">New Features</label>
+        <textarea id="new_features" name="new_features" placeholder="One feature per line..."></textarea>
+        <p class="hint">Enter one feature per line.</p>
+
+        <label for="bug_fixes">Bug Fixes</label>
+        <textarea id="bug_fixes" name="bug_fixes" placeholder="One fix per line..."></textarea>
+        <p class="hint">Enter one fix per line.</p>
+
+        <label for="breaking_changes">Breaking Changes</label>
+        <textarea id="breaking_changes" name="breaking_changes" placeholder="One breaking change per line..."></textarea>
+        <p class="hint">Enter one change per line.</p>
+
+        <label for="known_issues">Known Issues</label>
+        <textarea id="known_issues" name="known_issues" placeholder="One issue per line..."></textarea>
+        <p class="hint">Enter one issue per line.</p>
+
+        <label for="upgrade_notes">Upgrade Notes</label>
+        <textarea id="upgrade_notes" name="upgrade_notes" placeholder="Instructions for upgrading from the previous version..."></textarea>
+
+        <label for="contributors">Contributors</label>
+        <textarea id="contributors" name="contributors" placeholder="One contributor per line..."></textarea>
+        <p class="hint">Enter one name per line.</p>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Generate Release Document</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
